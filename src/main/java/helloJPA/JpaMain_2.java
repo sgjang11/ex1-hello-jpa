@@ -1,11 +1,14 @@
 package helloJPA;
 
 import org.hibernate.Hibernate;
+import org.hibernate.type.LocalDateTimeType;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.EntityTransaction;
 import javax.persistence.Persistence;
+import java.time.LocalDateTime;
+import java.util.Date;
 import java.util.List;
 
 public class JpaMain_2 {
@@ -93,6 +96,7 @@ public class JpaMain_2 {
             // 지연로딩이지만 team join을 원한다면
             List<Member> selectMember2 = entityManager.createQuery("select m from Member m join fetch m.team", Member.class).getResultList();
 */
+/*
             Child child1 = new Child();
             Child child2 = new Child();
 
@@ -107,7 +111,51 @@ public class JpaMain_2 {
             //entityManager.persist(child2);
 
             entityManager.persist(parent);
+*/
+/*
+            Address homeAddress = new Address("city1", "street1", "zipcode1");
 
+            Member_2 member1 = new Member_2();
+            member1.setUsername("jpa1");
+            member1.setPeriod(new Period());
+            member1.setHomeAddress(homeAddress);
+            member1.setWorkAddress(new Address("city2","street2","zipcode2"));
+            entityManager.persist(member1);
+
+            Address copyAddress = new Address(homeAddress.getCity(), homeAddress.getStreet(), homeAddress.getZipcode());
+
+            Member_2 member2 = new Member_2();
+            member2.setUsername("jpa");
+            member2.setPeriod(new Period());
+            member2.setHomeAddress(copyAddress);
+            member2.setWorkAddress(new Address("city2","street2","zipcode2"));
+            entityManager.persist(member2);
+
+            member1.getHomeAddress().setCity("newCity");
+*/
+            Member_2 member = new Member_2();
+            member.setUsername("member1");
+            member.setHomeAddress(new Address("homeCity","street","10000"));
+
+            member.getFavoriteFoods().add("치킨");
+            member.getFavoriteFoods().add("족발");
+            member.getFavoriteFoods().add("피자");
+
+            member.getAddressHistory().add(new Address("old1", "street", "10000"));
+            member.getAddressHistory().add(new Address("old2", "street", "10000"));
+
+            entityManager.persist(member);
+
+            entityManager.flush();
+            entityManager.clear();
+
+            System.out.println("========================");
+            Member_2 findMember = entityManager.find(Member_2.class, member.getId());
+
+            List<Address> addressHistory = findMember.getAddressHistory();
+            for (Address address : addressHistory) {
+                System.out.println("address = " + address.getCity());
+            }
             entityTransaction.commit();
         } catch (Exception e) {
             entityTransaction.rollback();

@@ -141,8 +141,11 @@ public class JpaMain_2 {
             member.getFavoriteFoods().add("족발");
             member.getFavoriteFoods().add("피자");
 
-            member.getAddressHistory().add(new Address("old1", "street", "10000"));
-            member.getAddressHistory().add(new Address("old2", "street", "10000"));
+        //    member.getAddressHistory().add(new Address("old1", "street", "10000"));
+        //    member.getAddressHistory().add(new Address("old2", "street", "10000"));
+            // 대안
+            member.getAddressHistory().add(new AddressEntity("old1", "street", "10000"));
+            member.getAddressHistory().add(new AddressEntity("old2", "street", "10000"));
 
             entityManager.persist(member);
 
@@ -152,10 +155,27 @@ public class JpaMain_2 {
             System.out.println("========================");
             Member_2 findMember = entityManager.find(Member_2.class, member.getId());
 
-            List<Address> addressHistory = findMember.getAddressHistory();
-            for (Address address : addressHistory) {
+            // 컬렉션들은 지연로딩이라 가지고 오라고 신호를 줘야 select 함 기본 위처럼 find하면 컬렉션 제외한 것을 select함.
+/*            List<Address> addressHistory = findMember.getAddressHistory();
+            for (AddressEntity address : addressHistory) {
                 System.out.println("address = " + address.getCity());
             }
+*/
+            
+            // 수정 아래와 같이 통으로 교체해줘야함
+//            Address homeAddress = findMember.getHomeAddress();
+//            findMember.setHomeAddress(new Address("newCity",homeAddress.getStreet(), homeAddress.getZipcode()));
+
+            // 컬렉션 수정 (제거하고 추가해야함)
+//            findMember.getFavoriteFoods().remove("치킨");
+//            findMember.getFavoriteFoods().add("한식");
+
+
+            // 만약  member.getAddressHistory().add(new Address("old1", "street", "10000")); 이거의 city를 변경하고 싶으면
+            // 단 equals/hashcode가 반드시 있어야함.
+//            findMember.getAddressHistory().remove(new Address("old1", "street", "10000"));
+//            findMember.getAddressHistory().add(new Address("newCity1", "street", "10000"));
+
             entityTransaction.commit();
         } catch (Exception e) {
             entityTransaction.rollback();
